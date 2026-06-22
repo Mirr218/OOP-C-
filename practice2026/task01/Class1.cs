@@ -4,13 +4,13 @@ namespace task01
 {
     public static class StringExtensions
     {
-        public static bool IsPalindrome(this string str)
+        public static bool IsPalindrome(this string input)
         {
-            if (str == null) return false;
+            if (input == null) return false;
 
-            string input = str.ToLower();
+            string str = input.ToLower();
             StringBuilder sb = new StringBuilder();
-            foreach(char c in input)
+            foreach(char c in str)
             {
                 if (char.IsWhiteSpace(c) || char.IsPunctuation(c)) { continue; }
                 else { sb.Append(c); }
