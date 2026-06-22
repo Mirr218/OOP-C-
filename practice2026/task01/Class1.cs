@@ -6,8 +6,6 @@ namespace task01
     {
         public static bool IsPalindrome(this string input)
         {
-            if (input == null) return false;
-
             string str = input.ToLower();
             StringBuilder sb = new StringBuilder();
             foreach(char c in str)
@@ -17,6 +15,7 @@ namespace task01
             }
 
             string cleaned = sb.ToString();
+            if (String.IsNullOrEmpty(cleaned)) return false;
             return cleaned == String.Concat(cleaned.Reverse());
         }
     }
