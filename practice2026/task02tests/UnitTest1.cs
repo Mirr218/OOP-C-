@@ -27,6 +27,32 @@ public class StudentServiceTests
     }
 
     [Fact]
+    public void GetStudentsWithMinAverageGrade_ReturnsCorrectStudents()
+    {
+        var result = _service.GetStudentsWithMinAverageGrade(4.0).ToList();
+        Assert.Equal(2, result.Count);
+        Assert.True(result.All(s => s.Grades.Average() >= 4.0));
+    }
+
+    [Fact]
+    public void GetStudentsOrderedByName_ReturnsSortedStudents()
+    {
+        var result = _service.GetStudentsOrderedByName().ToList();
+        Assert.Equal("Анна", result[0].Name);
+        Assert.Equal("Иван", result[1].Name);
+        Assert.Equal("Петр", result[2].Name);
+    }
+
+    [Fact]
+    public void GroupStudentsByFaculty_ReturnsCorrectGroups()
+    {
+        var result = _service.GroupStudentsByFaculty();
+        Assert.Equal(2, result.Count);
+        Assert.Equal(2, result["ФИТ"].Count());
+        Assert.Single(result["Экономика"]);
+    }
+
+    [Fact]
     public void GetFacultyWithHighestAverageGrade_ReturnsCorrectFaculty()
     {
         var result = _service.GetFacultyWithHighestAverageGrade();
