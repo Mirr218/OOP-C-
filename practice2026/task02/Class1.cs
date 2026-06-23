@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace task02;
+﻿namespace task02;
 
 public class Student
 {
