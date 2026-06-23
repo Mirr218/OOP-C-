@@ -1,4 +1,6 @@
-﻿namespace task02;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace task02;
 
 public class Student
 {
@@ -15,21 +17,21 @@ public class StudentService
 
         // 1. Возвращает студентов указанного факультета
         public IEnumerable<Student> GetStudentsByFaculty(string faculty)
-            => new List<Student>(); // Заглушка
+            => _students.Where(s => s.Faculty == faculty);
 
         // 2. Возвращает студентов со средним баллом >= minAverageGrade
         public IEnumerable<Student> GetStudentsWithMinAverageGrade(double minAverageGrade)
-            => new List<Student>(); // Заглушка
+            => _students.Where(s => s.Grades.Average() >= minAverageGrade);
 
         // 3. Возвращает студентов, отсортированных по имени (A-Z)
         public IEnumerable<Student> GetStudentsOrderedByName()
-            => new List<Student>(); // Заглушка
+            => _students.OrderBy(s => s.Name);
 
         // 4. Группировка по факультету
         public ILookup<string, Student> GroupStudentsByFaculty()
-            => new List<Student>().ToLookup(s => s.Faculty);
+            => _students.ToLookup(s => s.Faculty);
 
-        // 5. Находит факультет с максимальным средним баллом
+        // 5. Находит факультет с максимальным средним баллом (Сначала находим средний балл каждого студента, потом находим средний балл от средних баллов факультета)
         public string GetFacultyWithHighestAverageGrade()
-            => ""; // Заглушка
+            => _students.GroupBy(s => s.Faculty).OrderByDescending(group => group.Select(s => s.Grades.Average()).Average()).First().Key;
     }
