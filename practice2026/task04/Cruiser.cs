@@ -2,9 +2,9 @@ namespace task04;
 
 public class Cruiser : ISpaceship
 {
-    public int Speed => throw new NotImplementedException();
-    public int FirePower => throw new NotImplementedException();
-    public void MoveForward() => throw new NotImplementedException();
-    public void Rotate(int angle) => throw new NotImplementedException();
-    public void Fire() => throw new NotImplementedException();
+    public int Speed => 50;
+    public int FirePower => 100;
+    public void MoveForward() => Console.WriteLine("Move Move Move!!!");
+    public void Rotate(int angle) => Console.WriteLine($"Rotation on {angle} degrees");
+    public void Fire() => Console.WriteLine("KABOOOOM");
 }
