@@ -1,4 +1,5 @@
 using Xunit;
+using task05;
 
 public class TestClass
 {
@@ -6,7 +7,7 @@ public class TestClass
     private string _privateField;
     public int Property { get; set; }
 
-    public void Method() { }
+    public void Method(string name, int age) { }
 }
 
 [Serializable]
@@ -30,5 +31,32 @@ public class ClassAnalyzerTests
         var fields = analyzer.GetAllFields();
 
         Assert.Contains("_privateField", fields);
+    }
+    
+    [Fact]
+    public void GetMethodParams_ReturnsCorrectParams()
+    {
+        var analyzer = new ClassAnalyzer(typeof(TestClass));
+        var parameters = analyzer.GetMethodParams("Method");
+
+        Assert.Contains("name", parameters);
+        Assert.Contains("age", parameters);
+    }
+
+    [Fact]
+    public void GetProperties_IncludesProperties()
+    {
+        var analyzer = new ClassAnalyzer(typeof(TestClass));
+        var props = analyzer.GetProperties();
+
+        Assert.Contains("Property", props);
+    }
+
+    [Fact]
+    public void HasAttribute_ReturnsCorrectAttribute()
+    {
+        var analyzer = new ClassAnalyzer(typeof(AttributedClass));
+
+        Assert.True(analyzer.HasAttribute<SerializableAttribute>());
     }
 }
