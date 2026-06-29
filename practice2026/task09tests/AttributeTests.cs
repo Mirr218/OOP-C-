@@ -2,6 +2,7 @@ using System.Reflection;
 using CommandLib;
 using FileSystemCommands;
 using Xunit;
+using task07;
 
 namespace task09tests;
 
