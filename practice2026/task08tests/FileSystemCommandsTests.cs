@@ -13,21 +13,28 @@ public class FileSystemCommandsTests
         // Arrange: создаем временную директорию с файлами
         var testDir = Path.Combine(Path.GetTempPath(), "TestDir");
         Directory.CreateDirectory(testDir);
-        File.WriteAllText(Path.Combine(testDir, "test1.txt"), "Hello");
-        File.WriteAllText(Path.Combine(testDir, "test2.txt"), "World");
+        File.WriteAllText(Path.Combine(testDir, "test1.txt"), "Hello"); // 5 байт
+        File.WriteAllText(Path.Combine(testDir, "test2.txt"), "World"); // 5 байт
+
+        // Перехватываем консольный вывод
+        var stringWriter = new StringWriter();
+        var originalOut = Console.Out;
+        Console.SetOut(stringWriter);
 
         try
         {
             // Act: создаем команду и выполняем
             var command = new DirectorySizeCommand(testDir);
-            command.Execute(); // Проверяем, что не возникает исключений
+            command.Execute();
 
-            // Assert: в реальном тесте можно было бы проверить вывод,
-            // но пока просто проверяем, что метод выполнился без ошибок
+            // Assert: проверяем, что в выводе есть размер
+            var output = stringWriter.ToString();
+            Assert.Contains("10", output); // 5 + 5 = 10 байт
         }
         finally
         {
-            // Cleanup: удаляем временную директорию
+            Console.SetOut(originalOut);
+            stringWriter.Dispose();
             if (Directory.Exists(testDir))
             {
                 Directory.Delete(testDir, true);
@@ -44,17 +51,26 @@ public class FileSystemCommandsTests
         File.WriteAllText(Path.Combine(testDir, "file1.txt"), "Text");
         File.WriteAllText(Path.Combine(testDir, "file2.log"), "Log");
 
+        // Перехватываем консольный вывод
+        var stringWriter = new StringWriter();
+        var originalOut = Console.Out;
+        Console.SetOut(stringWriter);
+
         try
         {
             // Act: создаем команду и выполняем
             var command = new FindFilesCommand(testDir, "*.txt");
-            command.Execute(); // Должен найти 1 файл
+            command.Execute();
 
-            // Assert: пока просто проверяем, что метод выполнился без ошибок
+            // Assert: проверяем, что найден только .txt файл
+            var output = stringWriter.ToString();
+            Assert.Contains("file1.txt", output);
+            Assert.DoesNotContain("file2.log", output);
         }
         finally
         {
-            // удаляем временную директорию
+            Console.SetOut(originalOut);
+            stringWriter.Dispose();
             if (Directory.Exists(testDir))
             {
                 Directory.Delete(testDir, true);
