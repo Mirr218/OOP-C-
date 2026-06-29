@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using CommandLib;
 
 namespace FileSystemCommands;
@@ -16,6 +17,18 @@ public class FindFilesCommand : ICommand
     
     public void Execute()
     {
-        // Заглушка: пока ничего не делает
+        if (!Directory.Exists(_path))
+        {
+            Console.WriteLine($"Каталог {_path} не существует");
+            return;
+        }
+
+        var files = Directory.GetFiles(_path, _mask, SearchOption.AllDirectories);
+        
+        Console.WriteLine($"Найдено файлов: {files.Length}");
+        foreach (var file in files)
+        {
+            Console.WriteLine($"  {Path.GetFileName(file)}");
+        }
     }
 }
