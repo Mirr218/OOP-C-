@@ -3,10 +3,14 @@ using task07;
 using Xunit;
 
 
+[DisplayName("Пример класса")]
+[Version(1, 0)]
 public class SampleClass
 {
+    [DisplayName("Числовое свойство")]
     public int Number { get; set; }
     
+    [DisplayName("Тестовый метод")]
     public void TestMethod()
     {
     }
@@ -27,6 +31,8 @@ public class AttributeReflectionTests
     public void Method_HasDisplayNameAttribute()
     {
         var method = typeof(SampleClass).GetMethod("TestMethod");
+        Assert.NotNull(method);  //Добавил, чтобы GetCustomAttribute не принял null (ругался компилятор)
+
         var attribute = method.GetCustomAttribute<DisplayNameAttribute>();
         Assert.NotNull(attribute);
         Assert.Equal("Тестовый метод", attribute.DisplayName);
@@ -36,6 +42,8 @@ public class AttributeReflectionTests
     public void Property_HasDisplayNameAttribute()
     {
         var prop = typeof(SampleClass).GetProperty("Number");
+        Assert.NotNull(prop); //Добавил, чтобы GetCustomAttribute не принял null (ругался компилятор)
+
         var attribute = prop.GetCustomAttribute<DisplayNameAttribute>();
         Assert.NotNull(attribute);
         Assert.Equal("Числовое свойство", attribute.DisplayName);
