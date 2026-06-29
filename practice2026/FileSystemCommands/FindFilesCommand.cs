@@ -4,6 +4,8 @@ using CommandLib;
 
 namespace FileSystemCommands;
 
+[DisplayName("Поиск файлов по маске")]
+[Version(1, 0)]
 public class FindFilesCommand : ICommand
 {
     private readonly string _path;
@@ -15,6 +17,7 @@ public class FindFilesCommand : ICommand
         _mask = mask;
     }
     
+    [DisplayName("Выполнить команду")]
     public void Execute()
     {
         if (!Directory.Exists(_path))
