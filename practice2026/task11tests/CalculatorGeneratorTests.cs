@@ -7,6 +7,7 @@ public class CalculatorGeneratorTests
 {
     private const string CalculatorCode = @"
 using System;
+using task11;
 
 public class Calculator : ICalculator
 {
@@ -98,6 +99,8 @@ public class InvalidClass
     {
         // Arrange
         string codeWithoutTargetType = @"
+using task11;
+
 public class SomeOtherClass
 {
     public void DoSomething() { }
