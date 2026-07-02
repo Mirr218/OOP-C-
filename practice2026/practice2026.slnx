@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PluginLib/PluginLib.csproj" />
+  <Project Path="PluginManager/PluginManager.csproj" />
+  <Project Path="task10tests/task10tests.csproj" />
+  <Project Path="TestPlugins/TestPlugins.csproj" />
+</Solution>
