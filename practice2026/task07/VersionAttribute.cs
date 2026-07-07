@@ -9,8 +9,15 @@ public class VersionAttribute : Attribute
     
     public VersionAttribute(int major, int minor)
     {
-        ArgumentException.ThrowIfNegative(major);
-        ArgumentException.ThrowIfNegative(minor);
+        if (major < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(major), "Major version cannot be negative.");
+        }
+        
+        if (minor < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(minor), "Minor version cannot be negative.");
+        }
 
         Major = major;
         Minor = minor;
