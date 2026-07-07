@@ -20,7 +20,27 @@ if (!File.Exists(dllPath))
 }
 
 // 2. Динамически загружаем сборку в память
-Assembly assembly = Assembly.LoadFrom(dllPath);
+Assembly assembly;
+try
+{
+    assembly = Assembly.LoadFrom(dllPath);
+}
+catch (BadImageFormatException)
+{
+    Console.WriteLine($"Ошибка: Файл {dllPath} не является валидной .NET сборкой.");
+    return;
+}
+catch (FileLoadException ex)
+{
+    Console.WriteLine($"Ошибка загрузки сборки: {ex.Message}");
+    return;
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Непредвиденная ошибка при загрузке сборки: {ex.Message}");
+    return;
+}
+
 Console.WriteLine($"Сборка '{assembly.GetName().Name}' успешно загружена!\n");
 
 // 3. Ищем все классы, которые реализуют интерфейс ICommand
