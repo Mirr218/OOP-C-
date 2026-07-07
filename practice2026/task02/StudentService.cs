@@ -1,4 +1,4 @@
-﻿namespace StudentService;
+﻿namespace StudentServiceLib;
 
 public class Student
 {
