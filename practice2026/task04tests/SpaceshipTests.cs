@@ -37,44 +37,42 @@ public class SpaceshipTests
     }
 
     [Fact]
-    public void Cruiser_MoveForward_ShouldNotThrow()
+    public void MoveForward_PositionBySpeed()
     {
-        ISpaceship cruiser = new Cruiser();
+        var cruiser = new Cruiser();
         cruiser.MoveForward();
-    }
+        Assert.Equal(50, cruiser.Position);
 
-    [Fact]
-    public void Cruiser_Rotate_ShouldNotThrow()
-    {
-        ISpaceship cruiser = new Cruiser();
-        cruiser.Rotate(90);
-    }
-
-    [Fact]
-    public void Cruiser_Fire_ShouldNotThrow()
-    {
-        ISpaceship cruiser = new Cruiser();
-        cruiser.Fire();
-    }
-
-    [Fact]
-    public void Fighter_MoveForward_ShouldNotThrow()
-    {
-        ISpaceship fighter = new Fighter();
+        var fighter = new Fighter();
         fighter.MoveForward();
+        fighter.MoveForward();
+        Assert.Equal(200, fighter.Position);
     }
 
     [Fact]
-    public void Fighter_Rotate_ShouldNotThrow()
+    public void Fire_ShouldIncrementShots()
     {
-        ISpaceship fighter = new Fighter();
-        fighter.Rotate(45);
-    }
+        var cruiser = new Cruiser();
+        cruiser.Fire();
+        Assert.Equal(1, cruiser.Shots);
 
-    [Fact]
-    public void Fighter_Fire_ShouldNotThrow()
-    {
-        ISpaceship fighter = new Fighter();
+        var fighter = new Fighter();
         fighter.Fire();
+        fighter.Fire();
+        Assert.Equal(2, fighter.Shots);
+    }
+
+    [Fact]
+    public void Rotate_ShouldUpdateAngle()
+    {
+        var cruiser = new Cruiser();
+        cruiser.Rotate(300);
+        cruiser.Rotate(100);
+        Assert.Equal(40, cruiser.CurrAngle);
+
+        var fighter = new Fighter();
+        fighter.Rotate(-45);
+        fighter.Rotate(45);
+        Assert.Equal(0, fighter.CurrAngle);
     }
 }
