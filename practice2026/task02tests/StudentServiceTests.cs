@@ -1,4 +1,4 @@
-﻿using StudentService;
+﻿using StudentServiceLib;
 
 namespace StudentServiceTests;
 
