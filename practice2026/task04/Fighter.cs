@@ -4,7 +4,25 @@ public class Fighter : ISpaceship
 {
     public int Speed => 100;
     public int FirePower => 17;
-    public void MoveForward() => Console.WriteLine("Move Move Move!!! FASTER");
-    public void Rotate(int angle) => Console.WriteLine($"Rotation on {angle} degrees");
-    public void Fire() => Console.WriteLine("Pew, Pew, Pew");
+    
+    public double Position { get; private set; } = 0;
+    public int CurrAngle { get; private set; } = 0;
+    public int Shots { get; private set; } = 0;
+
+    public void MoveForward()
+    {
+        Position+= Speed;
+    }
+    public void Rotate(int angle)
+    {
+        CurrAngle = (CurrAngle + angle) % 360;
+        if(CurrAngle < 0)
+        {
+            CurrAngle+=360;
+        }
+    }
+    public void Fire()
+    {
+        Shots++;
+    }
 }
