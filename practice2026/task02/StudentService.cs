@@ -1,4 +1,4 @@
-﻿namespace task02;
+﻿namespace StudentService;
 
 public class Student
 {
