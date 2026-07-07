@@ -1,6 +1,6 @@
-﻿using task02;
+﻿using StudentService;
 
-namespace task02tests;
+namespace StudentServiceTests;
 
 public class StudentServiceTests
 {
