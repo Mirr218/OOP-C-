@@ -32,9 +32,26 @@ catch (Exception ex)
 Console.WriteLine($"Сборка: {assembly.GetName().Name}");
 Console.WriteLine(new string('=', 60));
 
-var types = assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract);
+Type[] types;
+try
+{
+    types = assembly.GetTypes();
+}
+catch (ReflectionTypeLoadException ex)
+{
+    // При этом исключении часть типов всё равно загружена — берём их
+    types = ex.Types.Where(t => t != null).ToArray()!;
+    Console.WriteLine("Предупреждение: не все типы удалось загрузить:");
+    foreach (var loaderEx in ex.LoaderExceptions)
+    {
+        Console.WriteLine($"  - {loaderEx.Message}");
+    }
+    Console.WriteLine();
+}
 
-foreach (Type type in types)
+var classTypes = types.Where(t => t.IsClass && !t.IsAbstract);
+
+foreach (Type type in classTypes)
 {
     Console.WriteLine($"\nКласс: {type.Name}");
 
