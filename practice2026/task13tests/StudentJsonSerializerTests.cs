@@ -85,4 +85,13 @@ public class StudentJsonSerializerTests
         Assert.Contains("\"birthDate\":\"1990-01-01\"", json);
         Assert.DoesNotContain("T00:00:00", json);
     }
+
+    [Fact]
+    public void DeserializeReturnsCustomBirthDate()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\"}";
+        var student = StudentJsonSerializer.Deserialize(json);
+        Assert.NotNull(student);
+        Assert.Equal(new DateTime(1990, 1, 1), student.BirthDate);
+    }
 }
