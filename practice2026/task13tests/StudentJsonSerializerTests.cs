@@ -73,7 +73,7 @@ public class StudentJsonSerializerTests
     }
 
     [Fact]
-    public void SerializeReurnsCustomBirthDate()
+    public void SerializeReturnsCustomBirthDate()
     {
         var student = new Student{
             FirstName = "John",
@@ -87,11 +87,67 @@ public class StudentJsonSerializerTests
     }
 
     [Fact]
-    public void DeserializeReturnsCustomBirthDate()
+    public void DeserializeReturnsStudent()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"Math\",\"grade\":90},{\"name\":\"English\",\"grade\":85}]}";
+
+        var student = StudentJsonSerializer.Deserialize(json);
+
+        Assert.NotNull(student);
+        Assert.Equal("John", student.FirstName);
+        Assert.Equal("Doe", student.LastName);
+        Assert.Equal(new DateTime(1990, 1, 1), student.BirthDate);
+        Assert.NotNull(student.Grades);
+        Assert.Equal(2, student.Grades.Count);
+        Assert.Equal("Math", student.Grades[0].Name);
+        Assert.Equal(90, student.Grades[0].Grade);
+    }
+
+    [Fact]
+    public void DeserializeWithEmptyFirstNameThrowsException()
+    {
+        var json = "{\"firstName\":\"\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"Math\",\"grade\":90}]}";
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
+    }
+
+    [Fact]
+    public void DeserializeWithEmptyLastNameThrowsException()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"Math\",\"grade\":90}]}";
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
+    }
+
+    [Fact]
+    public void DeserializeWithoutBirthDateThrowsException()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"grades\":[{\"name\":\"Math\",\"grade\":90}]}";
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
+    }
+
+    [Fact]
+    public void DeserializeWithoutGradesThrowsException()
     {
         var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\"}";
-        var student = StudentJsonSerializer.Deserialize(json);
-        Assert.NotNull(student);
-        Assert.Equal(new DateTime(1990, 1, 1), student.BirthDate);
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
+    }
+
+    [Fact]
+    public void DeserializeWithEmptySubjectNameThrowsException()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"\",\"grade\":90}]}";
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
+    }
+
+    [Fact]
+    public void DeserializeWithInvalidGradeThrowsException()
+    {
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"Math\",\"grade\":101}]}";
+
+        Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
     }
 }
