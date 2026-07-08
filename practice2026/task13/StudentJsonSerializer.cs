@@ -6,13 +6,23 @@ namespace task13;
 
 public class StudentJsonSerializer
 {
-
-    public static string Serialize(Student student)
+    private static JsonSerializerOptions CreateOptions()
     {
-        return JsonSerializer.Serialize(student, new JsonSerializerOptions {
+        return new JsonSerializerOptions
+        {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new CustomDateConverter() }
-        });
+        };
+    }
+
+    public static string Serialize(Student student)
+    {
+        return JsonSerializer.Serialize(student, CreateOptions());
+    }
+
+    public static Student? Deserialize(string json)
+    {
+        return JsonSerializer.Deserialize<Student>(json, CreateOptions());
     }
 }
