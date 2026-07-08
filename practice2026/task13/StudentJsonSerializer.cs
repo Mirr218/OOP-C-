@@ -11,7 +11,6 @@ public class StudentJsonSerializer
         return JsonSerializer.Serialize(student, new JsonSerializerOptions {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters = { new JsonStringEnumConverter() }
         });
     }
 }
