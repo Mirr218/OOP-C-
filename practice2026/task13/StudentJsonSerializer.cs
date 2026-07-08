@@ -21,8 +21,53 @@ public class StudentJsonSerializer
         return JsonSerializer.Serialize(student, CreateOptions());
     }
 
-    public static Student? Deserialize(string json)
+    public static Student Deserialize(string json)
     {
-        return JsonSerializer.Deserialize<Student>(json, CreateOptions());
+        var student = JsonSerializer.Deserialize<Student>(json, CreateOptions());
+
+        Validate(student);
+
+        return student!;
+    }
+
+    private static void Validate(Student? student)
+    {
+        if (student is null)
+        {
+            throw new InvalidOperationException("Invalid student data.");
+        }
+
+        if (string.IsNullOrWhiteSpace(student.FirstName))
+        {
+            throw new InvalidOperationException("Invalid student data.");
+        }
+
+        if (string.IsNullOrWhiteSpace(student.LastName))
+        {
+            throw new InvalidOperationException("Invalid student data.");
+        }
+
+        if (student.BirthDate is null)
+        {
+            throw new InvalidOperationException("Invalid student data.");
+        }
+
+        if (student.Grades is null || student.Grades.Count == 0)
+        {
+            throw new InvalidOperationException("Invalid student data.");
+        }
+
+        foreach (var subject in student.Grades)
+        {
+            if (string.IsNullOrWhiteSpace(subject.Name))
+            {
+                throw new InvalidOperationException("Invalid student data.");
+            }
+
+            if (subject.Grade is null || subject.Grade < 0 || subject.Grade > 100)
+            {
+                throw new InvalidOperationException("Invalid student data.");
+            }
+        }
     }
 }
