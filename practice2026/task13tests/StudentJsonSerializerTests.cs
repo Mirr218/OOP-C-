@@ -150,4 +150,55 @@ public class StudentJsonSerializerTests
 
         Assert.Throws<InvalidOperationException>(() => StudentJsonSerializer.Deserialize(json));
     }
+
+    [Fact]
+    public void SaveToFileWritesJson()
+    {
+        var path = Path.GetTempFileName();
+        var student = new Student{
+            FirstName = "John",
+            LastName = "Doe",
+            BirthDate = new DateTime(1990, 1, 1),
+            Grades = new List<Subject>{
+                new Subject{Name = "Math", Grade = 90}
+            }
+        };
+
+        try
+        {
+            StudentJsonSerializer.SaveToFile(student, path);
+
+            var json = File.ReadAllText(path);
+            Assert.Contains("\"firstName\":\"John\"", json);
+            Assert.Contains("\"birthDate\":\"1990-01-01\"", json);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void LoadFromFileReturnsStudent()
+    {
+        var path = Path.GetTempFileName();
+        var json = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"birthDate\":\"1990-01-01\",\"grades\":[{\"name\":\"Math\",\"grade\":90}]}";
+
+        try
+        {
+            File.WriteAllText(path, json);
+
+            var student = StudentJsonSerializer.LoadFromFile(path);
+
+            Assert.Equal("John", student.FirstName);
+            Assert.Equal(new DateTime(1990, 1, 1), student.BirthDate);
+            Assert.NotNull(student.Grades);
+            Assert.Single(student.Grades);
+            Assert.Equal("Math", student.Grades[0].Name);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }
