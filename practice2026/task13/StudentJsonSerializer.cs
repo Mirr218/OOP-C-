@@ -30,6 +30,18 @@ public class StudentJsonSerializer
         return student!;
     }
 
+    public static void SaveToFile(Student student, string path)
+    {
+        var json = Serialize(student);
+        File.WriteAllText(path, json);
+    }
+
+    public static Student LoadFromFile(string path)
+    {
+        var json = File.ReadAllText(path);
+        return Deserialize(json);
+    }
+
     private static void Validate(Student? student)
     {
         if (student is null)
