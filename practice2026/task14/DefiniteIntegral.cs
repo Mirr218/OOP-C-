@@ -21,6 +21,8 @@ public class DefiniteIntegral
                 double localResult = CalculatePart(localA, localB, function, step);
                 result += localResult;
             });
+
+            threads[i].Start();
         }
 
         foreach (var thread in threads)
