@@ -9,6 +9,8 @@ public class DefiniteIntegral
         
         double result = 0.0;
         
+        using var barrier = new Barrier(threadsNumber + 1);
+
         double partLength = (b - a) / threadsNumber;
 
         for (int i = 0; i < threadsNumber; i++)
@@ -20,15 +22,13 @@ public class DefiniteIntegral
             {
                 double localResult = CalculatePart(localA, localB, function, step);
                 AddToResult(ref result, localResult);
+                barrier.SignalAndWait();
             });
 
             threads[i].Start();
         }
 
-        foreach (var thread in threads)
-        {
-            thread.Join();
-        }
+        barrier.SignalAndWait();
 
         return result;
     }
