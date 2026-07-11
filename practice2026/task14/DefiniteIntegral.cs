@@ -19,7 +19,7 @@ public class DefiniteIntegral
             threads[i] = new Thread(() =>
             {
                 double localResult = CalculatePart(localA, localB, function, step);
-                result += localResult;
+                AddToResult(ref result, localResult);
             });
 
             threads[i].Start();
@@ -47,5 +47,18 @@ public class DefiniteIntegral
         }
 
         return result;
+    }
+
+    private static void AddToResult(ref double result, double value)
+    {
+        double initialValue;
+        double computedValue;
+
+        do
+        {
+            initialValue = result;
+            computedValue = initialValue + value;
+        }
+        while (Interlocked.CompareExchange(ref result, computedValue, initialValue) != initialValue);
     }
 }
