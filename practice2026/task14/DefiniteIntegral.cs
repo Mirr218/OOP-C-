@@ -1,9 +1,12 @@
 ﻿namespace task14;
+using System.Threading;
 
 public class DefiniteIntegral
 {
     public static double Solve(double a, double b, Func<double, double> function, double step, int threadsNumber)
     {
+        Thread[] threads = new Thread[threadsNumber];
+        
         double result = 0.0;
         
         double partLength = (b - a) / threadsNumber;
@@ -13,7 +16,16 @@ public class DefiniteIntegral
             double localA = a + i * partLength;
             double localB = i == threadsNumber - 1 ? b : localA + partLength;
 
-            result += CalculatePart(localA, localB, function, step);
+            threads[i] = new Thread(() =>
+            {
+                double localResult = CalculatePart(localA, localB, function, step);
+                result += localResult;
+            });
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
         }
 
         return result;
