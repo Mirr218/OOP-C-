@@ -5,6 +5,21 @@ public class DefiniteIntegral
 {
     public static double Solve(double a, double b, Func<double, double> function, double step, int threadsNumber)
     {
+        if (function is null)
+        {
+            throw new ArgumentNullException(nameof(function));
+        }
+
+        if (step <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(step));
+        }
+
+        if (threadsNumber <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(threadsNumber));
+        }
+
         Thread[] threads = new Thread[threadsNumber];
         
         double result = 0.0;
