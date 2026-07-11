@@ -4,6 +4,11 @@ public class DefiniteIntegral
 {
     public static double Solve(double a, double b, Func<double, double> function, double step, int threadsNumber)
     {
+        return CalculatePart(a, b, function, step);
+    }
+
+    private static double CalculatePart(double a, double b, Func<double, double> function, double step)
+    {
         double result = 0.0;
 
         for (double x = a; x < b; x += step)
