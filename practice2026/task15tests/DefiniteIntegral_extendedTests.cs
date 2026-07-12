@@ -153,6 +153,31 @@ public class DefiniteIntegralTests
         }
     }
 
+    [Fact]
+    public void SaveThreadMeasurementsCsv_WritesChartDataToFile()
+    {
+        var path = Path.GetTempFileName();
+        ThreadMeasurement[] measurements =
+        [
+            new ThreadMeasurement(2, 0, 0, 10),
+            new ThreadMeasurement(4, 0, 0, 7)
+        ];
+
+        try
+        {
+            IntegralBenchmark.SaveThreadMeasurementsCsv(path, measurements);
+
+            var csv = File.ReadAllText(path);
+            Assert.Contains("threads,averageMilliseconds", csv);
+            Assert.Contains("2,10", csv);
+            Assert.Contains("4,7", csv);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
     [Fact(Skip = "Manual report generation. Remove Skip and change parameters to create a txt report.")]
     public void GeneratePerformanceReportTxt_Manual()
     {
@@ -193,6 +218,10 @@ public class DefiniteIntegralTests
             reportDirectory,
             $"task15-report-step-{selectedStep.Step}-threads-{selectedThread.ThreadsNumber}.txt");
 
+        var csvPath = Path.Combine(
+            reportDirectory,
+            $"task15-thread-measurements-step-{selectedStep.Step}.csv");
+
         IntegralBenchmark.SaveReport(
             reportPath,
             selectedStep,
@@ -201,6 +230,9 @@ public class DefiniteIntegralTests
             stepMeasurements,
             threadMeasurements);
 
+        IntegralBenchmark.SaveThreadMeasurementsCsv(csvPath, threadMeasurements);
+
         Assert.True(File.Exists(reportPath));
+        Assert.True(File.Exists(csvPath));
     }
 }
