@@ -115,4 +115,92 @@ public class DefiniteIntegralTests
         Assert.True(comparison.SingleThreadMilliseconds >= 0);
         Assert.True(comparison.MultithreadMilliseconds >= 0);
     }
+
+    [Fact]
+    public void CreateReport_ReturnsTextWithSelectedParameters()
+    {
+        var selectedStep = new StepMeasurement(1e-2, 0, 0, 10, true);
+        var selectedThread = new ThreadMeasurement(4, 0, 0, 5);
+        var comparison = new PerformanceComparison(1e-2, 4, 20, 5, 15, 75);
+
+        var report = IntegralBenchmark.CreateReport(selectedStep, selectedThread, comparison);
+
+        Assert.Contains("Шаг: 0.01", report);
+        Assert.Contains("Количество потоков: 4", report);
+        Assert.Contains("Ускорение: 75", report);
+    }
+
+    [Fact]
+    public void SaveReport_WritesReportToFile()
+    {
+        var path = Path.GetTempFileName();
+        var selectedStep = new StepMeasurement(1e-2, 0, 0, 10, true);
+        var selectedThread = new ThreadMeasurement(4, 0, 0, 5);
+        var comparison = new PerformanceComparison(1e-2, 4, 20, 5, 15, 75);
+
+        try
+        {
+            IntegralBenchmark.SaveReport(path, selectedStep, selectedThread, comparison);
+
+            var report = File.ReadAllText(path);
+            Assert.Contains("Задание 15. Отчёт по производительности", report);
+            Assert.Contains("Время однопоточной версии: 20", report);
+            Assert.Contains("Время многопоточной версии: 5", report);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact(Skip = "Manual report generation. Remove Skip and change parameters to create a txt report.")]
+    public void GeneratePerformanceReportTxt_Manual()
+    {
+        int repeats = 3;
+        int threadsForStepSearch = 4;
+        double[] steps = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6];
+        int[] threadCounts = [1, 2, 4, 8, 16];
+
+        var stepMeasurements = IntegralBenchmark.MeasureSteps(
+            threadsForStepSearch,
+            repeats,
+            steps);
+
+        var selectedStep = stepMeasurements
+            .Where(measurement => measurement.IsAccurate)
+            .OrderBy(measurement => measurement.AverageMilliseconds)
+            .First();
+
+        var threadMeasurements = IntegralBenchmark.MeasureThreads(
+            selectedStep.Step,
+            repeats,
+            threadCounts);
+
+        var selectedThread = threadMeasurements
+            .OrderBy(measurement => measurement.AverageMilliseconds)
+            .First();
+
+        var comparison = IntegralBenchmark.CompareWithSingleThread(
+            selectedStep.Step,
+            selectedThread.ThreadsNumber,
+            repeats);
+
+        var reportDirectory = Path.GetFullPath(
+            Path.Combine(AppContext.BaseDirectory, "../../../../task15-reports"));
+        Directory.CreateDirectory(reportDirectory);
+
+        var reportPath = Path.Combine(
+            reportDirectory,
+            $"task15-report-step-{selectedStep.Step}-threads-{selectedThread.ThreadsNumber}.txt");
+
+        IntegralBenchmark.SaveReport(
+            reportPath,
+            selectedStep,
+            selectedThread,
+            comparison,
+            stepMeasurements,
+            threadMeasurements);
+
+        Assert.True(File.Exists(reportPath));
+    }
 }
