@@ -15,6 +15,14 @@ public record ThreadMeasurement(
     double Error,
     double AverageMilliseconds);
 
+public record PerformanceComparison(
+    double Step,
+    int ThreadsNumber,
+    double SingleThreadMilliseconds,
+    double MultithreadMilliseconds,
+    double DifferenceMilliseconds,
+    double SpeedupPercent);
+
 public static class IntegralBenchmark
 {
     public static readonly double[] DefaultSteps = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6];
@@ -126,6 +134,48 @@ public static class IntegralBenchmark
         return MeasureThreads(step, repeats, threadCounts)
             .OrderBy(measurement => measurement.AverageMilliseconds)
             .First();
+    }
+
+    public static PerformanceComparison CompareWithSingleThread(
+        double step,
+        int threadsNumber,
+        int repeats)
+    {
+        if (step <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(step));
+        }
+
+        if (threadsNumber <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(threadsNumber));
+        }
+
+        if (repeats <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(repeats));
+        }
+
+        double singleThreadMilliseconds = MeasureAverageMilliseconds(repeats, () =>
+        {
+            DefiniteIntegral.SolveSingleThread(A, B, Math.Sin, step);
+        });
+
+        double multithreadMilliseconds = MeasureAverageMilliseconds(repeats, () =>
+        {
+            DefiniteIntegral.Solve(A, B, Math.Sin, step, threadsNumber);
+        });
+
+        double differenceMilliseconds = singleThreadMilliseconds - multithreadMilliseconds;
+        double speedupPercent = differenceMilliseconds / singleThreadMilliseconds * 100.0;
+
+        return new PerformanceComparison(
+            step,
+            threadsNumber,
+            singleThreadMilliseconds,
+            multithreadMilliseconds,
+            differenceMilliseconds,
+            speedupPercent);
     }
 
     private static double MeasureAverageMilliseconds(int repeats, Action action)
