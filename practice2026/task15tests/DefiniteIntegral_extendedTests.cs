@@ -101,4 +101,18 @@ public class DefiniteIntegralTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             IntegralBenchmark.MeasureThreads(step: 0, repeats: 1, threadCounts: [1, 2]));
     }
+
+    [Fact]
+    public void CompareWithSingleThread_ReturnsPerformanceComparison()
+    {
+        var comparison = IntegralBenchmark.CompareWithSingleThread(
+            step: 1e-2,
+            threadsNumber: 2,
+            repeats: 1);
+
+        Assert.Equal(1e-2, comparison.Step);
+        Assert.Equal(2, comparison.ThreadsNumber);
+        Assert.True(comparison.SingleThreadMilliseconds >= 0);
+        Assert.True(comparison.MultithreadMilliseconds >= 0);
+    }
 }
