@@ -177,14 +177,14 @@ public class DefiniteIntegralTests
             File.Delete(path);
         }
     }
-
-    [Fact(Skip = "Manual report generation. Remove Skip and change parameters to create a txt report.")]
+    //(Skip = "Manual report generation. Remove Skip and change parameters to create a txt report.")
+    [Fact]
     public void GeneratePerformanceReportTxt_Manual()
     {
-        int repeats = 3;
-        int threadsForStepSearch = 4;
+        int repeats = 5;
+        int threadsForStepSearch = 8;
         double[] steps = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6];
-        int[] threadCounts = [2, 4, 8, 16];
+        int[] threadCounts = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
         var stepMeasurements = IntegralBenchmark.MeasureSteps(
             threadsForStepSearch,
