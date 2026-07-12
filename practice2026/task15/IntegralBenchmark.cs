@@ -266,6 +266,24 @@ public static class IntegralBenchmark
         File.WriteAllText(path, report);
     }
 
+    public static void SaveThreadMeasurementsCsv(
+        string path,
+        IEnumerable<ThreadMeasurement> threadMeasurements)
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine("threads,averageMilliseconds");
+
+        foreach (var measurement in threadMeasurements)
+        {
+            builder.AppendLine(
+                $"{measurement.ThreadsNumber}," +
+                $"{FormatDouble(measurement.AverageMilliseconds)}");
+        }
+
+        File.WriteAllText(path, builder.ToString());
+    }
+
     private static double MeasureAverageMilliseconds(int repeats, Action action)
     {
         double totalMilliseconds = 0.0;
