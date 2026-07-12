@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 
 namespace task15;
 
@@ -178,6 +180,92 @@ public static class IntegralBenchmark
             speedupPercent);
     }
 
+    public static string CreateReport(
+        StepMeasurement selectedStep,
+        ThreadMeasurement selectedThread,
+        PerformanceComparison comparison,
+        IEnumerable<StepMeasurement>? stepMeasurements = null,
+        IEnumerable<ThreadMeasurement>? threadMeasurements = null)
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine("Задание 15. Отчёт по производительности");
+        builder.AppendLine();
+        builder.AppendLine("Интеграл:");
+        builder.AppendLine("Функция: sin(x)");
+        builder.AppendLine("Отрезок: [-100, 100]");
+        builder.AppendLine("Требуемая точность: 1e-4");
+        builder.AppendLine();
+        builder.AppendLine("Выбранный шаг:");
+        builder.AppendLine($"Шаг: {FormatDouble(selectedStep.Step)}");
+        builder.AppendLine($"Значение интеграла: {FormatDouble(selectedStep.Value)}");
+        builder.AppendLine($"Погрешность: {FormatDouble(selectedStep.Error)}");
+        builder.AppendLine($"Среднее время: {FormatDouble(selectedStep.AverageMilliseconds)} мс");
+        builder.AppendLine();
+        builder.AppendLine("Оптимальное количество потоков:");
+        builder.AppendLine($"Количество потоков: {selectedThread.ThreadsNumber}");
+        builder.AppendLine($"Значение интеграла: {FormatDouble(selectedThread.Value)}");
+        builder.AppendLine($"Погрешность: {FormatDouble(selectedThread.Error)}");
+        builder.AppendLine($"Среднее время: {FormatDouble(selectedThread.AverageMilliseconds)} мс");
+        builder.AppendLine();
+        builder.AppendLine("Сравнение однопоточной и многопоточной версии:");
+        builder.AppendLine($"Шаг для сравнения: {FormatDouble(comparison.Step)}");
+        builder.AppendLine($"Количество потоков в многопоточной версии: {comparison.ThreadsNumber}");
+        builder.AppendLine($"Время однопоточной версии: {FormatDouble(comparison.SingleThreadMilliseconds)} мс");
+        builder.AppendLine($"Время многопоточной версии: {FormatDouble(comparison.MultithreadMilliseconds)} мс");
+        builder.AppendLine($"Разница: {FormatDouble(comparison.DifferenceMilliseconds)} мс");
+        builder.AppendLine($"Ускорение: {FormatDouble(comparison.SpeedupPercent)}%");
+
+        if (stepMeasurements is not null)
+        {
+            builder.AppendLine();
+            builder.AppendLine("Замеры по шагам:");
+            foreach (var measurement in stepMeasurements)
+            {
+                builder.AppendLine(
+                    $"шаг={FormatDouble(measurement.Step)}, " +
+                    $"значение={FormatDouble(measurement.Value)}, " +
+                    $"погрешность={FormatDouble(measurement.Error)}, " +
+                    $"среднееВремяМс={FormatDouble(measurement.AverageMilliseconds)}, " +
+                    $"точностьДостигнута={measurement.IsAccurate}");
+            }
+        }
+
+        if (threadMeasurements is not null)
+        {
+            builder.AppendLine();
+            builder.AppendLine("Замеры по количеству потоков:");
+            foreach (var measurement in threadMeasurements)
+            {
+                builder.AppendLine(
+                    $"потоки={measurement.ThreadsNumber}, " +
+                    $"значение={FormatDouble(measurement.Value)}, " +
+                    $"погрешность={FormatDouble(measurement.Error)}, " +
+                    $"среднееВремяМс={FormatDouble(measurement.AverageMilliseconds)}");
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    public static void SaveReport(
+        string path,
+        StepMeasurement selectedStep,
+        ThreadMeasurement selectedThread,
+        PerformanceComparison comparison,
+        IEnumerable<StepMeasurement>? stepMeasurements = null,
+        IEnumerable<ThreadMeasurement>? threadMeasurements = null)
+    {
+        var report = CreateReport(
+            selectedStep,
+            selectedThread,
+            comparison,
+            stepMeasurements,
+            threadMeasurements);
+
+        File.WriteAllText(path, report);
+    }
+
     private static double MeasureAverageMilliseconds(int repeats, Action action)
     {
         double totalMilliseconds = 0.0;
@@ -192,5 +280,10 @@ public static class IntegralBenchmark
         }
 
         return totalMilliseconds / repeats;
+    }
+
+    private static string FormatDouble(double value)
+    {
+        return value.ToString("G17", CultureInfo.InvariantCulture);
     }
 }
