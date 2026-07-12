@@ -34,4 +34,38 @@ public class DefiniteIntegralTests
 
         Assert.Equal(singleThreaded, multithreaded, 1e-4);
     }
+
+    [Fact]
+    public void MeasureSteps_ReturnsMeasurementsForEachStep()
+    {
+        double[] steps = [1e-1, 1e-2];
+
+        var measurements = IntegralBenchmark.MeasureSteps(threadsNumber: 2, repeats: 1, steps);
+
+        Assert.Equal(2, measurements.Count);
+        Assert.All(measurements, measurement =>
+        {
+            Assert.True(measurement.Step > 0);
+            Assert.True(measurement.AverageMilliseconds >= 0);
+            Assert.True(measurement.Error >= 0);
+        });
+    }
+
+    [Fact]
+    public void FindFastestAccurateStep_ReturnsAccurateMeasurement()
+    {
+        double[] steps = [1e-1, 1e-2];
+
+        var measurement = IntegralBenchmark.FindFastestAccurateStep(threadsNumber: 2, repeats: 1, steps);
+
+        Assert.True(measurement.IsAccurate);
+        Assert.True(measurement.Error <= 1e-4);
+    }
+
+    [Fact]
+    public void MeasureSteps_WithInvalidRepeats_ThrowsException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            IntegralBenchmark.MeasureSteps(threadsNumber: 2, repeats: 0, steps: [1e-1]));
+    }
 }
