@@ -159,7 +159,7 @@ public class DefiniteIntegralTests
         int repeats = 3;
         int threadsForStepSearch = 4;
         double[] steps = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6];
-        int[] threadCounts = [1, 2, 4, 8, 16];
+        int[] threadCounts = [2, 4, 8, 16];
 
         var stepMeasurements = IntegralBenchmark.MeasureSteps(
             threadsForStepSearch,

@@ -9,7 +9,7 @@ public class DefiniteIntegral
         ValidateArguments(function, step, threadsNumber);
 
         Thread[] threads = new Thread[threadsNumber];
-        double result = 0.0;
+        double[] partialResults = new double[threadsNumber];
         using var barrier = new Barrier(threadsNumber + 1);
 
         double partLength = (b - a) / threadsNumber;
@@ -18,11 +18,11 @@ public class DefiniteIntegral
         {
             double localA = a + i * partLength;
             double localB = i == threadsNumber - 1 ? b : localA + partLength;
+            int threadIndex = i;
 
             threads[i] = new Thread(() =>
             {
-                double localResult = CalculatePart(localA, localB, function, step);
-                AddToResult(ref result, localResult);
+                partialResults[threadIndex] = CalculatePart(localA, localB, function, step);
                 barrier.SignalAndWait();
             });
 
@@ -31,7 +31,7 @@ public class DefiniteIntegral
 
         barrier.SignalAndWait();
 
-        return result;
+        return partialResults.Sum();
     }
 
     public static double SolveSingleThread(double a, double b, Func<double, double> function, double step)
@@ -73,18 +73,5 @@ public class DefiniteIntegral
         }
 
         return result;
-    }
-
-    private static void AddToResult(ref double result, double value)
-    {
-        double initialValue;
-        double computedValue;
-
-        do
-        {
-            initialValue = result;
-            computedValue = initialValue + value;
-        }
-        while (Interlocked.CompareExchange(ref result, computedValue, initialValue) != initialValue);
     }
 }
