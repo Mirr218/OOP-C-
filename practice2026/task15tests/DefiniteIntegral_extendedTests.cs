@@ -68,4 +68,37 @@ public class DefiniteIntegralTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             IntegralBenchmark.MeasureSteps(threadsNumber: 2, repeats: 0, steps: [1e-1]));
     }
+
+    [Fact]
+    public void MeasureThreads_ReturnsMeasurementsForEachThreadCount()
+    {
+        int[] threadCounts = [1, 2];
+
+        var measurements = IntegralBenchmark.MeasureThreads(step: 1e-2, repeats: 1, threadCounts);
+
+        Assert.Equal(2, measurements.Count);
+        Assert.All(measurements, measurement =>
+        {
+            Assert.True(measurement.ThreadsNumber > 0);
+            Assert.True(measurement.AverageMilliseconds >= 0);
+            Assert.True(measurement.Error >= 0);
+        });
+    }
+
+    [Fact]
+    public void FindFastestThreadCount_ReturnsMeasurementFromThreadCounts()
+    {
+        int[] threadCounts = [1, 2];
+
+        var measurement = IntegralBenchmark.FindFastestThreadCount(step: 1e-2, repeats: 1, threadCounts);
+
+        Assert.Contains(measurement.ThreadsNumber, threadCounts);
+    }
+
+    [Fact]
+    public void MeasureThreads_WithInvalidStep_ThrowsException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            IntegralBenchmark.MeasureThreads(step: 0, repeats: 1, threadCounts: [1, 2]));
+    }
 }
