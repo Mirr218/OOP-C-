@@ -113,4 +113,26 @@ public class ServerThreadTests
 
         Assert.Equal(["after exception"], log);
     }
+
+    [Fact]
+    public void HardStop_SkipsAllCommandsAfterIt() 
+    {
+        var log = new List<int>();
+        var serverThread = new ServerThread();
+
+        serverThread.Start();
+
+        serverThread.Enqueue(new ActionCommand(() => log.Add(1)));
+        serverThread.Enqueue(new HardStopCommand(serverThread));
+
+        for (int i = 2; i <= 10; i++)
+        {
+            int value = i;
+            serverThread.Enqueue(new ActionCommand(() => log.Add(value)));
+        }
+
+        serverThread.Join();
+
+        Assert.Equal([1], log);
+    }
 }
