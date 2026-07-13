@@ -79,4 +79,38 @@ public class ServerThreadTests
         var command = new HardStopCommand(serverThread);
         Assert.Throws<InvalidOperationException>(() => command.Execute());
     }
+
+    [Fact]
+    public void ServerThread_WhenCommandThrows_CallsExceptionHandlerAndContinues()
+    {
+        var log = new List<string>();
+        var handledExceptions = new List<Exception>();
+        var handledCommands = new List<ICommand>();
+
+        var serverThread = new ServerThread();
+
+        serverThread.ExceptionHandler = (command, exception) =>
+        {
+            handledCommands.Add(command);
+            handledExceptions.Add(exception);
+        };
+
+        var throwingCommand = new ActionCommand(() => throw new InvalidOperationException("fail"));
+
+        serverThread.Start();
+
+        serverThread.Enqueue(throwingCommand);
+        serverThread.Enqueue(new ActionCommand(() => log.Add("after exception")));
+        serverThread.Enqueue(new SoftStopCommand(serverThread));
+
+        serverThread.Join();
+
+        Assert.Single(handledCommands);
+        Assert.Same(throwingCommand, handledCommands[0]);
+
+        Assert.Single(handledExceptions);
+        Assert.IsType<InvalidOperationException>(handledExceptions[0]);
+
+        Assert.Equal(["after exception"], log);
+    }
 }
