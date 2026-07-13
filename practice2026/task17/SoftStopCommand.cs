@@ -11,6 +11,7 @@ public class SoftStopCommand : ICommand
 
     public void Execute()
     {
+        _serverThread.ThrowIfNotCurrentThread();
         _serverThread.RequestSoftStop();
     }
 }

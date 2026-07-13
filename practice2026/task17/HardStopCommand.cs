@@ -11,6 +11,7 @@ public class HardStopCommand : ICommand
 
     public void Execute()
     {
+        _serverThread.ThrowIfNotCurrentThread();
         _serverThread.RequestHardStop();
     }
 }

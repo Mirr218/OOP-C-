@@ -8,6 +8,7 @@ public class ServerThread
     private Thread? _thread;
     private bool _softStopRequested;
     private bool _hardStopRequested;
+    internal bool IsCurrentThread => Thread.CurrentThread == _thread;
 
     public void Start()
     {
@@ -51,6 +52,14 @@ public class ServerThread
             {
                 break;
             }
+        }
+    }
+
+    internal void ThrowIfNotCurrentThread()
+    {
+        if (!IsCurrentThread)
+        {
+            throw new InvalidOperationException("Stop command can be executed only inside its server thread.");
         }
     }
 }
