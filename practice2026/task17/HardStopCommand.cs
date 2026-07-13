@@ -1,16 +1,16 @@
 namespace task17;
 
-public class SoftStopCommand : ICommand
+public class HardStopCommand : ICommand
 {
     private readonly ServerThread _serverThread;
 
-    public SoftStopCommand(ServerThread serverThread)
+    public HardStopCommand(ServerThread serverThread)
     {
         _serverThread = serverThread;
     }
 
     public void Execute()
     {
-        _serverThread.RequestSoftStop();
+        _serverThread.RequestHardStop();
     }
 }

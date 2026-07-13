@@ -7,6 +7,7 @@ public class ServerThread
     private readonly BlockingCollection<ICommand> _commands = new();
     private Thread? _thread;
     private bool _softStopRequested;
+    private bool _hardStopRequested;
 
     public void Start()
     {
@@ -29,12 +30,22 @@ public class ServerThread
         _softStopRequested = true;
     }
 
+    internal void RequestHardStop()
+    {
+        _hardStopRequested = true;
+    }
+
     private void Run()
     {
         while (true)
         {
             var command = _commands.Take();
             command.Execute();
+
+            if (_hardStopRequested)
+            {
+                break;
+            }
 
             if (_softStopRequested && _commands.Count == 0)
             {
