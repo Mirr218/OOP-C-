@@ -30,4 +30,37 @@ public class ServerThreadTests
         Assert.Single(log);
         Assert.Equal("Command executed", log[0]);
     }
+
+    [Fact]
+    public void SoftStop_ExecutesCommandsRemainingInQueue()
+    {
+        var log = new List<string>();
+        var serverThread = new ServerThread();
+
+        serverThread.Start();
+        
+        serverThread.Enqueue(new ActionCommand(() => log.Add("Command 1 executed")));
+        serverThread.Enqueue(new SoftStopCommand(serverThread));
+        serverThread.Enqueue(new ActionCommand(() => log.Add("Command 2 executed")));
+        
+        serverThread.Join();
+
+        Assert.Equal(["Command 1 executed", "Command 2 executed"], log);
+    }
+    [Fact]
+    public void HardStop_DoesNotExecuteCommandsRemainingInQueue() 
+    {
+        var log = new List<string>();
+        var serverThread = new ServerThread();
+        
+        serverThread.Start();
+
+        serverThread.Enqueue(new ActionCommand(() => log.Add("Command 1 executed")));
+        serverThread.Enqueue(new HardStopCommand(serverThread));
+        serverThread.Enqueue(new ActionCommand(() => log.Add("Command 2 executed")));
+
+        serverThread.Join();
+
+        Assert.Equal(["Command 1 executed"], log);
+    }
 }
