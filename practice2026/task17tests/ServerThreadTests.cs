@@ -52,7 +52,7 @@ public class ServerThreadTests
     {
         var log = new List<string>();
         var serverThread = new ServerThread();
-        
+
         serverThread.Start();
 
         serverThread.Enqueue(new ActionCommand(() => log.Add("Command 1 executed")));
@@ -62,5 +62,21 @@ public class ServerThreadTests
         serverThread.Join();
 
         Assert.Equal(["Command 1 executed"], log);
+    }
+
+    [Fact]
+    public void SoftStop_WhenExecutedOutsideServerThread_ThrowsException()
+    {
+        var serverThread = new ServerThread();
+        var command = new SoftStopCommand(serverThread);
+        Assert.Throws<InvalidOperationException>(() => command.Execute());
+    }
+
+    [Fact]
+    public void HardStop_WhenExecutedOutsideServerThread_ThrowsException()
+    {
+        var serverThread = new ServerThread();
+        var command = new HardStopCommand(serverThread);
+        Assert.Throws<InvalidOperationException>(() => command.Execute());
     }
 }
