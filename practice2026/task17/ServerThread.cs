@@ -1,0 +1,45 @@
+using System.Collections.Concurrent;
+using System.Threading;
+namespace task17;
+
+public class ServerThread
+{
+    private readonly BlockingCollection<ICommand> _commands = new();
+    private Thread? _thread;
+    private bool _softStopRequested;
+
+    public void Start()
+    {
+        _thread = new Thread(Run);
+        _thread.Start();
+    }
+
+    public void Enqueue(ICommand command)
+    {
+        _commands.Add(command);
+    }
+
+    public void Join()
+    {
+        _thread?.Join();
+    }
+
+    internal void RequestSoftStop()
+    {
+        _softStopRequested = true;
+    }
+
+    private void Run()
+    {
+        while (true)
+        {
+            var command = _commands.Take();
+            command.Execute();
+
+            if (_softStopRequested && _commands.Count == 0)
+            {
+                break;
+            }
+        }
+    }
+}
