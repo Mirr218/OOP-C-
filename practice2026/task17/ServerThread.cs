@@ -9,7 +9,8 @@ public class ServerThread
     private bool _softStopRequested;
     private bool _hardStopRequested;
     internal bool IsCurrentThread => Thread.CurrentThread == _thread;
-
+    public Action<ICommand, Exception>? ExceptionHandler { get; set; }
+    
     public void Start()
     {
         _thread = new Thread(Run);
@@ -41,7 +42,14 @@ public class ServerThread
         while (true)
         {
             var command = _commands.Take();
-            command.Execute();
+            try
+            {
+                command.Execute();
+            }
+            catch (Exception exception)
+            {
+                ExceptionHandler?.Invoke(command, exception);
+            }
 
             if (_hardStopRequested)
             {
