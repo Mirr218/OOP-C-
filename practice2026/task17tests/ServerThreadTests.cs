@@ -1,0 +1,33 @@
+﻿using task17;
+namespace task17tests;
+
+public class ServerThreadTests
+{
+    private class ActionCommand : ICommand
+    {
+        private readonly Action _action;
+
+        public ActionCommand(Action action)
+        {
+            _action = action;
+        }
+
+        public void Execute()
+        {
+            _action();
+        }
+    }
+    
+    [Fact]
+    public void ServerThread_ExecutesCommand() 
+    {
+        var log = new List<string>();
+        var serverThread = new ServerThread();
+        serverThread.Start();
+        serverThread.Enqueue(new ActionCommand(() => log.Add("Command executed")));
+        serverThread.Enqueue(new SoftStopCommand(serverThread));
+        serverThread.Join();
+        Assert.Single(log);
+        Assert.Equal("Command executed", log[0]);
+    }
+}
