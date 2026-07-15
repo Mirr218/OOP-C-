@@ -10,6 +10,7 @@ public class ServerThread
     private bool _hardStopRequested;
     internal bool IsCurrentThread => Thread.CurrentThread == _thread;
     public Action<ICommand, Exception>? ExceptionHandler { get; set; }
+    private readonly IScheduler _scheduler = new RoundRobinScheduler();
     
     public void Start()
     {
@@ -41,7 +42,27 @@ public class ServerThread
     {
         while (true)
         {
-            var command = _commands.Take();
+            ICommand? command = null;
+
+            if (_commands.TryTake(out var newCommand, 0))
+            {
+                command = newCommand;
+            }
+            else if (_scheduler.HasCommand())
+            {
+                command = _scheduler.Select();
+            }
+            else if (!_commands.TryTake(out newCommand, TimeSpan.FromMilliseconds(50)))
+            {
+                if (_hardStopRequested) break;
+                if (_softStopRequested && _commands.Count == 0 && !_scheduler.HasCommand()) break;
+                continue;
+            }
+            else
+            {
+                command = newCommand;
+            }
+
             try
             {
                 command.Execute();
@@ -51,15 +72,13 @@ public class ServerThread
                 ExceptionHandler?.Invoke(command, exception);
             }
 
-            if (_hardStopRequested)
+            if (command is ILongRunningCommand longRunning && !longRunning.IsCompleted)
             {
-                break;
+                _scheduler.Add(command);
             }
 
-            if (_softStopRequested && _commands.Count == 0)
-            {
-                break;
-            }
+            if (_hardStopRequested) break;
+            if (_softStopRequested && _commands.Count == 0 && !_scheduler.HasCommand()) break;
         }
     }
 
